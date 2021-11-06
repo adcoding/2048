@@ -1,0 +1,12 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Piece.tscn" type="PackedScene" id=1]
+[ext_resource path="res://models/tile2048.png" type="Texture" id=2]
+[ext_resource path="res://Pieces/4096Piece.tscn" type="PackedScene" id=3]
+
+[node name="2048Piece" instance=ExtResource( 1 )]
+value = 2048
+next_value = ExtResource( 3 )
+
+[node name="Sprite" parent="." index="0"]
+texture = ExtResource( 2 )
