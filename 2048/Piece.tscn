@@ -8,3 +8,9 @@ script = ExtResource( 1 )
 [node name="Sprite" type="Sprite" parent="."]
 
 [node name="MoveTween" type="Tween" parent="."]
+
+[node name="SizeTween" type="Tween" parent="."]
+
+[node name="ModulateTween" type="Tween" parent="."]
+
+[connection signal="tween_completed" from="ModulateTween" to="." method="_on_ModulateTween_tween_completed"]

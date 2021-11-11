@@ -9,6 +9,7 @@ var y_start := 440
 var offset := 85
 
 export var two_piece : PackedScene
+export var number_of_starting_pieces : int
 export var four_piece : PackedScene
 export var background_piece : PackedScene
 
@@ -18,15 +19,14 @@ func _ready():
 	randomize()
 	board = make_2d_array(4, 4, null)
 	generate_background()
-	generate_new_piece()
+	generate_new_piece(number_of_starting_pieces)
 
 func make_2d_array(width, height, value):
 	var array = []
-	for i in range(width):
+	for i in width:
 		array.append([])
-		array[i].resize(width)
-		for j in range(height):
-			array[i][j] = value
+		for j in height:
+			array[i].append(null)
 	return array
 
 func grid_to_pixel(grid_position: Vector2):
@@ -57,7 +57,7 @@ func move_all_pieces(direction: Vector2):
 	match direction:
 		Vector2.UP:
 			for i in width:
-				for j in range(height -1, -1, -1):
+				for j in range(height -2, -1, -1):
 					if board[i][j] != null:
 						move_piece(Vector2(i, j), Vector2.UP)
 		Vector2.DOWN:
@@ -66,11 +66,10 @@ func move_all_pieces(direction: Vector2):
 					if board[i][j] != null:
 						move_piece(Vector2(i, j), Vector2.DOWN)
 		Vector2.LEFT:
-			for i in range(width -1, -1, -1):
+			for i in range(1, width, 1):
 				for j in height:
 					if board[i][j] != null:
 						move_piece(Vector2(i, j), Vector2.LEFT)
-						print("left")
 		Vector2.RIGHT:
 			for i in range(width -2, -1, -1):
 				for j in height:
@@ -78,16 +77,16 @@ func move_all_pieces(direction: Vector2):
 						move_piece(Vector2(i, j), Vector2.RIGHT)
 		_:
 			continue
-	pass
+	generate_new_piece(1)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
 
-func generate_new_piece():
+func generate_new_piece(number_of_pieces: int):
 	if is_blank_space():
 		var pieces_made = 0
-		while pieces_made < 2:
+		while pieces_made < number_of_pieces:
 			var x_position = int(floor((rand_range(0,4))))
 			var y_position = int(floor((rand_range(0,4))))
 			if board[x_position][y_position] == null:
@@ -117,27 +116,25 @@ func move_and_set_board_value(current: Vector2, desired: Vector2):
 	var temp = board[current.x][current.y]
 	temp.move(grid_to_pixel(Vector2(desired.x, desired.y)))
 	board[current.x][current.y] = null
-	board[current.x][current.y] = temp
+	board[desired.x][desired.y] = temp
 
-func move_piece(piece: Vector2, direction):
+func move_piece(piece: Vector2, direction: Vector2):
 	#store piece
 	var this_piece = board[piece.x][piece.y]
 	var value = this_piece.value
+	var temp = board[piece.x][piece.y].next_value
 	#store the value of the next piece
 	var next_space = piece + direction
-	var temp = board[piece.x][piece.y].next_value
 	#var next_value = board[next_space.x][next_space.y]
 	match direction:
 		Vector2.RIGHT:
 			for i in range(next_space.x, width):
-				if i == width -1 && board[i][piece.y] == null:
-					move_and_set_board_value(piece, Vector2(width -1, piece.y))
+				if i == width - 1 && board[i][piece.y] == null:
+					move_and_set_board_value(piece, Vector2(width - 1, piece.y))
 					break
-				
 				if board[i][piece.y] != null && board[i][piece.y].value != value:
-					move_and_set_board_value(piece, Vector2(i -1, piece.y))
+					move_and_set_board_value(piece, Vector2(i - 1, piece.y))
 					break
-					
 				if board[i][piece.y] != null && board[i][piece.y].value == value:
 					remove_and_clear(piece)
 					remove_and_clear(Vector2(i, piece.y))
@@ -147,15 +144,13 @@ func move_piece(piece: Vector2, direction):
 					new_piece.position = grid_to_pixel(Vector2(i, piece.y))
 					break
 		Vector2.LEFT:
-			for i in range(next_space.x - 1, -1):
+			for i in range(next_space.x, - 1, -1):
 				if i == 0 && board[i][piece.y] == null:
 					move_and_set_board_value(piece, Vector2(0, piece.y))
 					break
-				
 				if board[i][piece.y] != null && board[i][piece.y].value != value:
 					move_and_set_board_value(piece, Vector2(i + 1, piece.y))
 					break
-				
 				if board[i][piece.y] != null && board[i][piece.y].value == value:
 					remove_and_clear(piece)
 					remove_and_clear(Vector2(i, piece.y))
@@ -183,20 +178,18 @@ func move_piece(piece: Vector2, direction):
 
 		Vector2.DOWN:
 			for i in range(piece.y -1, -1, -1):
-				if i == 0 && board[i][piece.y] == null:
+				if i == 0 && board[piece.x][i] == null:
 					move_and_set_board_value(piece, Vector2(piece.x, 0))
 					break;
-		
-				if board[i][piece.y] != null && board[i][piece.y].value != value:
+				if board[piece.x][i] != null && board[piece.x][i].value != value:
 					move_and_set_board_value(piece, Vector2(piece.x, i + 1))
 					break;
-
 				if board[piece.x][i] != null && board[piece.x][i].value == value:
 					remove_and_clear(piece)
 					remove_and_clear(Vector2(piece.x, i))
 					var new_piece = temp.instance()
 					add_child(new_piece)
-					board[i][piece.y] = new_piece
+					board[piece.x][i] = new_piece
 					new_piece.position = grid_to_pixel(Vector2(piece.x, i))
 					break;
 
