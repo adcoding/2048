@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://models/Background.png" type="Texture" id=1]
 [ext_resource path="res://models/board_background.png" type="Texture" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://Pieces/4Piece.tscn" type="PackedScene" id=6]
 [ext_resource path="res://Pieces/2Piece.tscn" type="PackedScene" id=7]
 [ext_resource path="res://Piecebackground.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Scripts/ScoreManager.gd" type="Script" id=9]
 
 [node name="Main" type="Node2D"]
 
@@ -27,6 +28,7 @@ texture = ExtResource( 2 )
 [node name="Grid" type="Node2D" parent="."]
 script = ExtResource( 5 )
 two_piece = ExtResource( 7 )
+number_of_starting_pieces = 2
 four_piece = ExtResource( 6 )
 background_piece = ExtResource( 8 )
 
@@ -35,6 +37,9 @@ script = ExtResource( 3 )
 
 [node name="KeyboardControl" type="Node2D" parent="."]
 script = ExtResource( 4 )
+
+[node name="ScoreManager" type="Node2D" parent="."]
+script = ExtResource( 9 )
 
 [connection signal="move" from="TouchControl" to="Grid" method="_on_TouchControl_move"]
 [connection signal="move" from="KeyboardControl" to="Grid" method="_on_KeyboardControl_move"]
